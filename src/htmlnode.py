@@ -1,9 +1,9 @@
 class HTMLNode:
     def __init__(self, tag=None, value=None, children=None, props=None):
-        self.tag = tag            # Název HTML tagu (např. 'p', 'a', 'h1')
-        self.value = value        # Textový obsah (např. "Hello World")
-        self.children = children  # Seznam potomků typu HTMLNode
-        self.props = props        # Slovník HTML atributů (např. {"href": "..."})
+        self.tag = tag
+        self.value = value
+        self.children = children
+        self.props = props
 
     def to_html(self):
         raise NotImplementedError("This method should be implemented in subclasses.")
@@ -19,3 +19,17 @@ class HTMLNode:
     def __repr__(self):
         return (f"HTMLNode(tag={self.tag}, value={self.value}, "
                 f"children={self.children}, props={self.props})")
+
+
+class LeafNode(HTMLNode):
+    def __init__(self, tag, value, props=None):
+        if value is None:
+            raise ValueError("LeafNode must have a value.")
+        super().__init__(tag=tag, value=value, children=None, props=props)
+
+    def to_html(self):
+        if self.value is None:
+            raise ValueError("LeafNode must have a value.")
+        if self.tag is None:
+            return self.value  # raw text, bez HTML tagu
+        return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
