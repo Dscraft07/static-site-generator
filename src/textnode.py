@@ -1,6 +1,6 @@
+from htmlnode import LeafNode
 from enum import Enum
 
-# Enum definující typy inline textu
 class TextType(Enum):
     TEXT = "text"
     BOLD = "bold"
@@ -9,15 +9,13 @@ class TextType(Enum):
     LINK = "link"
     IMAGE = "image"
 
-# Třída reprezentující inline textový prvek
 class TextNode:
     def __init__(self, text, text_type, url=None):
-        self.text = text                # textový obsah
-        self.text_type = text_type      # typ z TextType enumu
-        self.url = url                  # URL (pouze pro LINK a IMAGE)
+        self.text = text
+        self.text_type = text_type
+        self.url = url
 
     def __eq__(self, other):
-        # Porovnání dvou TextNode objektů (potřebné pro testy)
         return (
             self.text == other.text and
             self.text_type == other.text_type and
@@ -25,5 +23,26 @@ class TextNode:
         )
 
     def __repr__(self):
-        # Čitelná reprezentace objektu (pro debugging)
         return f"TextNode({self.text}, {self.text_type.value}, {self.url})"
+
+
+def text_node_to_html_node(text_node):
+    if text_node.text_type == TextType.TEXT:
+        return LeafNode(None, text_node.text)
+
+    if text_node.text_type == TextType.BOLD:
+        return LeafNode("b", text_node.text)
+
+    if text_node.text_type == TextType.ITALIC:
+        return LeafNode("i", text_node.text)
+
+    if text_node.text_type == TextType.CODE:
+        return LeafNode("code", text_node.text)
+
+    if text_node.text_type == TextType.LINK:
+        return LeafNode("a", text_node.text, {"href": text_node.url})
+
+    if text_node.text_type == TextType.IMAGE:
+        return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
+
+    raise ValueError(f"Unsupported text type: {text_node.text_type}")
